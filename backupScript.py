@@ -37,4 +37,9 @@ print (" variabili d'ambiente caricate correttamente")
 #####################################
 # Creazione cartella se inesistente #
 #####################################
-
+username = os.getenv('USERNAME')
+onedrivePath = f"C:\\Users\\{username}\\OneDrive"
+if os.path.exists(onedrivePath):
+    print("cartella onedrive trovata")
+else:
+    print("cartella onedrive NON trovata")
