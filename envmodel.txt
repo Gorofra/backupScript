@@ -1,0 +1,13 @@
+    #Windows general env
+    USERNAME =
+
+    ####################################
+    #Mysql Docker env
+    DB_CONTAINER_NAME =
+    DB_USER =
+    DB_PASSWORD =
+    DB_NAME =
+
+    ###################################
+    #Image Docker env
+    IMAGES_VOLUME_NAME =
