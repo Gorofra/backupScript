@@ -11,7 +11,9 @@ from dotenv import load_dotenv
 
  # subprocess.run(["docker","exec","--help"])
 
-
+##################################
+#      Caricamento variabili     #
+##################################
 
 load_dotenv()
 
@@ -20,6 +22,7 @@ required_vars = [
     "DB_USER",
     "DB_PASSWORD",
     "DB_NAME",
+    "USERNAME"
 ]
 
 missing_vars=[var for var in required_vars if not os.getenv(var)]
@@ -30,4 +33,8 @@ if missing_vars:
 
 print (" variabili d'ambiente caricate correttamente")
 
+
+#####################################
+# Creazione cartella se inesistente #
+#####################################
 
