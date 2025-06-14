@@ -48,6 +48,13 @@ def backupMysql():
         print(f"Errore durante il backup: {e}")
         sys.exit(1)
     
+    
+def backupImage():
+    # Funzione per il backup dell'immagine Docker
+    pass  # Implementazione futura
+
+
+
 ##################################
 #      Caricamento variabili     #
 ##################################
