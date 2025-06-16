@@ -40,7 +40,7 @@ def backupMysql():
         print("Eseguendo il backup del database...")
         subprocess.run([
             "docker", "exec", db_container_name,
-            "mysqldump", "-u", db_user, 
+            "mysqldump", "-u", db_user,
             f"-p{db_password}", db_name
         ], stdout=open(backupFile, 'w'), check=True)
         print(f"Backup completato: {backupFile}")
@@ -48,13 +48,23 @@ def backupMysql():
         print(f"Errore durante il backup: {e}")
         sys.exit(1)
     
-    
-def backupImage():
-    # Funzione per il backup dell'immagine Docker
-    pass  # Implementazione futura
+def backupDockerVolume():
+    backupPath = checkBackupFolder()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backupFile = backupPath / f"volume_{timestamp}.tar.gz"
 
-
-
+    db_container_name = os.getenv('DB_CONTAINER_NAME')
+    db_volume_name = os.getenv('IMAGES_VOLUME_NAME')
+    try:
+        print("Eseguente il backup delle foto...")
+        subprocess.run([
+            "docker", "run" ,"--rm" ,"--volumes-from",
+            f"{db_volume_name}",
+            f"-v {onedrivePath}:/Backup" , "ubuntu", "tar", "cvf", f"{backupFile}"
+        ])
+    except subprocess.CalledProcessError as e:
+        print(f"Errore durante il backup: {e}")
+        sys.exit
 ##################################
 #      Caricamento variabili     #
 ##################################
