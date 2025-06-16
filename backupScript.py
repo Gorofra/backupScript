@@ -12,7 +12,18 @@ from dotenv import load_dotenv
 #       Metodi e funzioni        #
 ##################################
 
+def checkOneDrive():
+    username = os.getenv('USERNAME')
+    onedrivePath = f"C:\\Users\\{username}\\OneDrive"
+    if os.path.exists(onedrivePath):
+        print("cartella onedrive trovata")
+        return onedrivePath
+    else:
+        print("cartella onedrive NON trovata")
+        exit(1)
+    
 
+#ricerca la cartella di backup in OneDrive, se non esiste la crea
 def checkBackupFolder():
     backupPath = Path(onedrivePath) / "Backup"
     if not backupPath.exists():
@@ -24,6 +35,8 @@ def checkBackupFolder():
         print("Cartella backup trovata.")
         
     return backupPath
+
+# Esegue il backup del database MySQL in un file .sql
 
 def backupMysql():
 
@@ -48,6 +61,7 @@ def backupMysql():
         print(f"Errore durante il backup: {e}")
         sys.exit(1)
     
+# Esegue il backup del volume Docker in un file .tar.gz
 def backupDockerVolume():
     backupPath = checkBackupFolder()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -62,19 +76,18 @@ def backupDockerVolume():
         subprocess.run([
             "docker", "run" ,"--rm" ,"-v",
             f"{db_volume_name}:/data","-v",
-            f"{backupPath}:/Backup" , "ubuntu","bash","-c", f"cd /data && tar czf /Backup/{backupFile} ."
+            f"{backupPath}:/Backup" , "ubuntu","bash","-c",
+            f"cd /data && tar czf /Backup/{backupFile} ."
         ])
+        print(f"Backup completato: {backupFile}")
     except subprocess.CalledProcessError as e:
         print(f"Errore durante il backup: {e}")
         sys.exit
+        
+        
 ##################################
 #      Caricamento variabili     #
 ##################################
-
-client = docker.from_env()
-# subprocess.run(["docker","exec","--help"])
-
-
 load_dotenv()
 
 requiredVars = [
@@ -99,19 +112,11 @@ print (" variabili d'ambiente caricate correttamente")
 #       Controllo directory         #
 #####################################
 
+onedrivePath = checkOneDrive()
 
-username = os.getenv('USERNAME')
-onedrivePath = f"C:\\Users\\{username}\\OneDrive"
-if os.path.exists(onedrivePath):
-    print("cartella onedrive trovata")
-    checkBackupFolder()
-else:
-    print("cartella onedrive NON trovata")
-    
-    
 #####################################
 #            START BACKUP           #
 #####################################
 
-#backupMysql()
+backupMysql()
 backupDockerVolume()
