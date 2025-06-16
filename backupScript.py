@@ -8,24 +8,39 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
+##################################
+#      Caricamento variabili     #
+##################################
 
+config = configparser.ConfigParser()
+config.read('backup.config.ini')
+db_container_name = config['mysql.docker.env']['db_container_name']
+db_user = config['mysql.docker.env']['db_user']
+db_password = config['mysql.docker.env']['db_password']
+db_name = config['mysql.docker.env']['db_name']
+db_volume_name = config['image.docker.env']['images_volume_name']
+onedrivePath = config['windows.general.env']['save_dir_path']
+
+configarr = [
+    ('db_container_name', db_container_name),
+    ('db_user', db_user),
+    ('db_password', db_password),
+    ('db_name', db_name),
+    ('db_volume_name', db_volume_name),
+    ('onedrivePath', onedrivePath)
+]
+
+for key, value in configarr:
+    if not value:
+        print(f"Errore: la variabile '{key}' non è stata definita nel file di configurazione.")
+        sys.exit(1)
 
 ##################################
 #       Metodi e funzioni        #
 ##################################
 
-def checkOneDrive():
-    username = os.getenv('USERNAME')
-    onedrivePath = f"C:\\Users\\{username}\\OneDrive"
-    if os.path.exists(onedrivePath):
-        print("cartella onedrive trovata")
-        return onedrivePath
-    else:
-        print("cartella onedrive NON trovata")
-        exit(1)
-    
 
-#ricerca la cartella di backup in OneDrive, se non esiste la crea
+#ricerca la cartella di backup nella cartella di destinazione, se non esiste la crea
 def checkBackupFolder():
     backupPath = Path(onedrivePath) / "Backup"
     if not backupPath.exists():
@@ -46,11 +61,6 @@ def backupMysql():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backupFile = backupPath / f"backup_{timestamp}.sql"
 
-    db_container_name = os.getenv('DB_CONTAINER_NAME')
-    db_user = os.getenv('DB_USER')
-    db_password = os.getenv('DB_PASSWORD')
-    db_name = os.getenv('DB_NAME')
-
     try:
         print("Eseguendo il backup del database...")
         subprocess.run([
@@ -68,9 +78,7 @@ def backupDockerVolume():
     backupPath = checkBackupFolder()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backupFile =f"volume_{timestamp}.tar.gz"
-
-    db_container_name = os.getenv('DB_CONTAINER_NAME')
-    db_volume_name = os.getenv('IMAGES_VOLUME_NAME')
+    
     print(f"Nome volume: {db_volume_name}")
     print(f"nome container: {db_container_name}")
     try:
@@ -87,34 +95,7 @@ def backupDockerVolume():
         sys.exit
         
         
-##################################
-#      Caricamento variabili     #
-##################################
-load_dotenv()
 
-requiredVars = [
-    "DB_CONTAINER_NAME",
-    "DB_USER",
-    "DB_PASSWORD",
-    "DB_NAME",
-    "USERNAME",
-    "IMAGES_VOLUME_NAME"
-]
-
-missingVars=[var for var in requiredVars if not os.getenv(var)]
-
-if missingVars:
-    print(f"ERRORE: Variabili mancanti nel .env: {', '.join(missingVars)}")
-    exit(1)
-
-print (" variabili d'ambiente caricate correttamente")
-
-
-#####################################
-#       Controllo directory         #
-#####################################
-
-onedrivePath = checkOneDrive()
 
 #####################################
 #            START BACKUP           #
