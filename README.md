@@ -1,3 +1,7 @@
+<h1>First Version</h1>
+<p>The first version allows direct modification of the backup.config.ini file, with the required information to easily perform backup to a folder of choice.<br> Check the releases, what is written below has had heavy modifications that still need to be reported.</p>
+
+
 <h1>Onedrive Docker backup Script</h1>
 <i>English version below</i><br><br>
 Questo script può essere utilizzato in caso si abbia bisogno di fare un Backup di un app che sfrutta un container Docker mysql e un volume Docker per salvare altri tipi di dati, ad esempio immagini, Direttamente su Onedrive;<br><br>
