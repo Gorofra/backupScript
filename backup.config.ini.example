@@ -10,4 +10,4 @@
 
 
     [image.docker.env]
-    images_volume_name =
+    volume_name =

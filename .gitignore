@@ -4,3 +4,4 @@ backup.config.ini
 /build
 /dist
 backup_manager.spec
+test.py

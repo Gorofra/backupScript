@@ -2,7 +2,6 @@ import os
 import sys
 import docker
 import subprocess
-import logging
 import configparser
 from datetime import datetime
 from pathlib import Path
@@ -18,47 +17,56 @@ db_container_name = config['mysql.docker.env']['db_container_name']
 db_user = config['mysql.docker.env']['db_user']
 db_password = config['mysql.docker.env']['db_password']
 db_name = config['mysql.docker.env']['db_name']
-db_volume_name = config['image.docker.env']['images_volume_name']
-onedrivePath = config['windows.general.env']['save_dir_path']
+volume_name = config['image.docker.env']['volume_name']
+save_dir_path = config['windows.general.env']['save_dir_path']
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+timestampLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
 
-configarr = [
+configArr = [
     ('db_container_name', db_container_name),
     ('db_user', db_user),
     ('db_password', db_password),
     ('db_name', db_name),
-    ('db_volume_name', db_volume_name),
-    ('onedrivePath', onedrivePath)
+    ('volume_name', volume_name),
+    ('save_dir_path', save_dir_path)
 ]
 
-for key, value in configarr:
-    if not value:
-        print(f"Errore: la variabile '{key}' non è stata definita nel file di configurazione.")
-        sys.exit(1)
+
 
 ##################################
 #       Metodi e funzioni        #
 ##################################
 
 
+# Funzione per aprire file
+def opener(path, flags):
+    return os.open(path, flags, )
+
+# Controllo se tutte le variabili sono state definite
+def checkVariables(configArr):
+    for key, value in configArr:
+        if not value:
+            with open('log.txt', 'a', opener=opener) as f:
+                print(f'Errore durante la fase di [VARIABILE MANCANTE] {key} {timestampLog}', file=f)
+            print(f"Errore: la variabile '{key}' non è stata definita nel file di configurazione.")
+            sys.exit(1)
+
 #ricerca la cartella di backup nella cartella di destinazione, se non esiste la crea
 def checkBackupFolder():
-    backupPath = Path(onedrivePath) / "Backup"
+    backupPath = Path(save_dir_path) / "Backup"
     if not backupPath.exists():
         print("Creazione cartella di backup...")
         backupPath.mkdir(parents=True, exist_ok=True)
         print("Cartella di backup creata.")
-        
     else:
         print("Cartella backup trovata.")
-        
     return backupPath
 
 # Esegue il backup del database MySQL in un file .sql
 
-def backupMysql():
+def backupDockerMysql():
 
     backupPath = checkBackupFolder()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backupFile = backupPath / f"backup_{timestamp}.sql"
 
     try:
@@ -70,27 +78,30 @@ def backupMysql():
         ], stdout=open(backupFile, 'w'), check=True)
         print(f"Backup completato: {backupFile}")
     except subprocess.CalledProcessError as e:
+        with open('log.txt', 'a', opener=opener) as f:
+            print(f'Errore durante la fase di [BACKUP DATABASE MYSQL] {timestampLog}', file=f)
         print(f"Errore durante il backup: {e}")
         sys.exit(1)
     
 # Esegue il backup del volume Docker in un file .tar.gz
 def backupDockerVolume():
     backupPath = checkBackupFolder()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backupFile =f"volume_{timestamp}.tar.gz"
     
-    print(f"Nome volume: {db_volume_name}")
+    print(f"Nome volume: {volume_name}")
     print(f"nome container: {db_container_name}")
     try:
         print("Eseguente il backup delle foto...")
         subprocess.run([
             "docker", "run" ,"--rm" ,"-v",
-            f"{db_volume_name}:/data","-v",
+            f"{volume_name}:/data","-v",
             f"{backupPath}:/Backup" , "ubuntu","bash","-c",
             f"cd /data && tar czf /Backup/{backupFile} ."
         ])
         print(f"Backup completato: {backupFile}")
     except subprocess.CalledProcessError as e:
+        with open('log.txt', 'a', opener=opener) as f:
+            print(f'Errore durante la fase di [BACKUP VOLUME] {timestampLog}', file=f)
         print(f"Errore durante il backup: {e}")
         sys.exit
         
@@ -100,6 +111,8 @@ def backupDockerVolume():
 #####################################
 #            START BACKUP           #
 #####################################
-
-backupMysql()
+checkVariables(configArr)
+backupDockerMysql()
 backupDockerVolume()
+with open('log.txt', 'a', opener=opener) as f:
+            print(f'[BACKUP COMPLETATO] {timestampLog}', file=f)

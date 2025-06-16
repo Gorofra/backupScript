@@ -1,0 +1,8 @@
+aThis will be written to somedir/spamspam.txt
+This will be written to somedir/spamspam.txt
+[BACKUP COMPLETATO] 20250616_231918
+[BACKUP COMPLETATO] 20250616_231952
+Errore durante la fase di [VARIABILE MANCANTE] 20250616_232007
+Errore durante la fase di [VARIABILE MANCANTE] db_user 20250616_232034
+Errore durante la fase di [VARIABILE MANCANTE] db_user 2025-06-16 23:21:56
+[BACKUP COMPLETATO] 2025-06-16 23:25:48
