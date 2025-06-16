@@ -1,0 +1,13 @@
+    [windows.general.env]
+    save_dir_path =
+
+
+    [mysql.docker.env]
+    db_container_name =
+    db_user =
+    db_password =
+    db_name =
+
+
+    [image.docker.env]
+    images_volume_name =
