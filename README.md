@@ -56,4 +56,4 @@ C:\path\to\backupScript\dist\backup_manager.exe<br>
 Add arguments (optional):<br>
 Leave empty<br>
 Start (optional):<br>
-C:\path\to\backupScript\dist\<br>
+C:\path\to\backupScript\dist\
