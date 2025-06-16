@@ -33,7 +33,7 @@ C:\path\to\backupScript\dist\
 
 
 <br><br><br><br>
-<h1>Docker backup Script eng</h1> This script can be used when you need to make a backup of an app that uses a Docker mysql container and a Docker volume to save other types of data, for example images, directly on Onedrive;<br><br>
+<h1>Docker backup Script eng</h1> This script can be used when you need to make a backup of an app that uses a Docker mysql container and a Docker volume to save other types of data, for example images, directly on OneDrive or in the folder of your choice;<br><br>
 It uses the MYSQLDUMP method for the sql database and docker commands directly in terminal for the volume.<br><br> 
 You just need to follow step by step the following points, make sure to correctly insert the variables of your docker/mysql inside .env<br><br>
 Using Task Manager (Task Scheduler) you will be able to automate your backup that will be saved directly in the Onedrive folder of the device,
