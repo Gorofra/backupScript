@@ -51,16 +51,18 @@ def backupMysql():
 def backupDockerVolume():
     backupPath = checkBackupFolder()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backupFile = backupPath / f"volume_{timestamp}.tar.gz"
+    backupFile =f"volume_{timestamp}.tar.gz"
 
     db_container_name = os.getenv('DB_CONTAINER_NAME')
     db_volume_name = os.getenv('IMAGES_VOLUME_NAME')
+    print(f"Nome volume: {db_volume_name}")
+    print(f"nome container: {db_container_name}")
     try:
         print("Eseguente il backup delle foto...")
         subprocess.run([
-            "docker", "run" ,"--rm" ,"--volumes-from",
-            f"{db_volume_name}",
-            f"-v {onedrivePath}:/Backup" , "ubuntu", "tar", "cvf", f"{backupFile}"
+            "docker", "run" ,"--rm" ,"-v",
+            f"{db_volume_name}:/data","-v",
+            f"{backupPath}:/Backup" , "ubuntu","bash","-c", f"cd /data && tar czf /Backup/{backupFile} ."
         ])
     except subprocess.CalledProcessError as e:
         print(f"Errore durante il backup: {e}")
@@ -69,7 +71,7 @@ def backupDockerVolume():
 #      Caricamento variabili     #
 ##################################
 
-
+client = docker.from_env()
 # subprocess.run(["docker","exec","--help"])
 
 
@@ -80,7 +82,8 @@ requiredVars = [
     "DB_USER",
     "DB_PASSWORD",
     "DB_NAME",
-    "USERNAME"
+    "USERNAME",
+    "IMAGES_VOLUME_NAME"
 ]
 
 missingVars=[var for var in requiredVars if not os.getenv(var)]
@@ -110,4 +113,5 @@ else:
 #            START BACKUP           #
 #####################################
 
-backupMysql()
+#backupMysql()
+backupDockerVolume()
