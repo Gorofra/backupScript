@@ -7,6 +7,11 @@ import pathlib
 import datetime
 from dotenv import load_dotenv
 
+# TEMPORANEAMENTE qui per evitare errori di lettura della configurazione
+def opener(path, flags):
+    return os.open(path, flags, )
+
+
 ##################################
 #      Caricamento variabili     #
 ##################################
@@ -23,8 +28,12 @@ save_dir = config['windows.general.env']['save_dir']
 
 dateNow = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 timestampLog = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
-
-deleteOlderThan = int(config['backup.time.env']['elimination_time'])*60
+try:
+    elimination_time = int(config['backup.time.env']['elimination_time'])*60
+except ValueError:
+    with open('log.txt', 'a', opener=opener) as f:
+                print(f'Errore durante la fase di [VARIABILE MANCANTE] Tempo eliminazione in minuti {timestampLog}', file=f)
+    sys.exit(1)
 timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 pathcompleto = save_dir_path + f"{save_dir}\\"
 
@@ -38,7 +47,7 @@ configArr = [
     ('volume_name', volume_name),
     ('save_dir_path', save_dir_path)
     ('save_dir', save_dir),
-    ('deleteOlderThan', deleteOlderThan),
+    ('elimination_time', elimination_time),
 ]
 
 
@@ -48,9 +57,9 @@ configArr = [
 ##################################
 
 
-# Funzione per aprire file
-def opener(path, flags):
-    return os.open(path, flags, )
+# # Funzione per aprire file [temporaneamente in alto]
+# def opener(path, flags):
+#     return os.open(path, flags, )
 
 # Controllo se tutte le variabili sono state definite
 def checkVariables(configArr):
@@ -128,23 +137,23 @@ def backupGroup():
         except OSError as e:
             sys.exit(1)
 
-#funzione per eliminare i file di backup più vecchi di deleteOlderThan
+#funzione per eliminare i file di backup più vecchi di elimination_time
 def reciclyngBackup():
     print("Inizio controllo file di backup...")
     for path in gruppoBackup:
         file_stat = pathlib.Path(path).stat()
         file_ctime = file_stat.st_ctime
         print(f"Controllo file: {path}, creato il: {formatDateTimestap(file_ctime)}")
-        if( timestamp - file_ctime > deleteOlderThan):
-            if(deleteOlderThan < 3600):
+        if( timestamp - file_ctime > elimination_time):
+            if(elimination_time < 3600):
                 with open('log.txt', 'a', opener=opener) as f:
-                    print(f"Il file {path} è più vecchio di {deleteOlderThan/60} minuti e verrà eliminato.", file=f)
-            elif(deleteOlderThan < 86400):
+                    print(f"Il file {path} è più vecchio di {elimination_time/60} minuti e verrà eliminato.", file=f)
+            elif(elimination_time < 86400):
                 with open('log.txt', 'a', opener=opener) as f:
-                    print(f"Il file {path} è più vecchio di {deleteOlderThan/3600} ore e verrà eliminato.", file=f)
+                    print(f"Il file {path} è più vecchio di {elimination_time/3600} ore e verrà eliminato.", file=f)
             else:
                 with open('log.txt', 'a', opener=opener) as f:
-                    print(f"Il file {path} è più vecchio di {deleteOlderThan/86000} giorni e verrà eliminato.", file=f)
+                    print(f"Il file {path} è più vecchio di {elimination_time/86000} giorni e verrà eliminato.", file=f)
             try:
                 os.remove(path)
             except OSError as e:
