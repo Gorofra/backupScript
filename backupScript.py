@@ -19,12 +19,14 @@ db_password = config['mysql.docker.env']['db_password']
 db_name = config['mysql.docker.env']['db_name']
 volume_name = config['image.docker.env']['volume_name']
 save_dir_path = config['windows.general.env']['save_dir_path']
+save_dir = config['windows.general.env']['save_dir']
+
 dateNow = datetime.now().strftime("%Y%m%d_%H%M%S")
 timestampLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
 
 deleteOlderThan = 604800  # seconds
 timestamp = datetime.timestamp(datetime.now())
-pathcompleto = save_dir_path + "Backup\\"
+pathcompleto = save_dir_path + f"{save_dir}\\"
 gruppoBackup = []
 
 configArr = [
@@ -58,13 +60,13 @@ def checkVariables(configArr):
 
 #ricerca la cartella di backup nella cartella di destinazione, se non esiste la crea
 def checkBackupFolder():
-    backupPath = pathlib.Path(save_dir_path) / "Backup"
+    backupPath = pathlib.Path(save_dir_path) / f"{save_dir}"
     if not backupPath.exists():
         print("Creazione cartella di backup...")
         backupPath.mkdir(parents=True, exist_ok=True)
         print("Cartella di backup creata.")
     else:
-        print("Cartella backup trovata.")
+        print(f"Cartella backup trovata. {backupPath}")
     return backupPath
 
 # Esegue il backup del database MySQL in un file .sql
@@ -99,8 +101,8 @@ def backupDockerVolume():
         subprocess.run([
             "docker", "run" ,"--rm" ,"-v",
             f"{volume_name}:/data","-v",
-            f"{backupPath}:/Backup" , "ubuntu","bash","-c",
-            f"cd /data && tar czf /Backup/{backupFile} ."
+            f"{backupPath}:/{save_dir}" , "ubuntu","bash","-c",
+            f"cd /data && tar czf /{save_dir}/{backupFile} ."
         ])
         print(f"Backup completato: {backupFile}")
     except subprocess.CalledProcessError as e:
@@ -128,8 +130,9 @@ def reciclyngBackup():
     for path in gruppoBackup:
         file_stat = pathlib.Path(path).stat()
         file_ctime = file_stat.st_ctime
+        print(f"Controllo file: {path}, creato il: {(file_ctime)}")
         if( timestamp - file_ctime > deleteOlderThan):
-            print(f"Controllo file: {path}, creato il: {(file_ctime)}")
+            
             with open('log.txt', 'a', opener=opener) as f:
                 print(f"Il file {path} è più vecchio di {deleteOlderThan/86000} giorni e verrà eliminato.")
             try:
@@ -137,6 +140,9 @@ def reciclyngBackup():
             except OSError as e:
                 print(f"Errore durante l'eliminazione del file {path}: {e}")
                 sys.exit(1)
+        else:
+            print(f"Il file {path} è stato creato il: {(file_ctime)} e non verrà eliminato.")
+
 
 def backupCompleted():
     with open('log.txt', 'a', opener=opener) as f:
