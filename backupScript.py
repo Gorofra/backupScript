@@ -3,8 +3,8 @@ import sys
 import docker
 import subprocess
 import configparser
+import pathlib
 from datetime import datetime
-from pathlib import Path
 from dotenv import load_dotenv
 
 ##################################
@@ -19,8 +19,13 @@ db_password = config['mysql.docker.env']['db_password']
 db_name = config['mysql.docker.env']['db_name']
 volume_name = config['image.docker.env']['volume_name']
 save_dir_path = config['windows.general.env']['save_dir_path']
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+dateNow = datetime.now().strftime("%Y%m%d_%H%M%S")
 timestampLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
+
+deleteOlderThan = 604800  # seconds
+timestamp = datetime.timestamp(datetime.now())
+pathcompleto = save_dir_path + "Backup\\"
+gruppoBackup = []
 
 configArr = [
     ('db_container_name', db_container_name),
@@ -53,7 +58,7 @@ def checkVariables(configArr):
 
 #ricerca la cartella di backup nella cartella di destinazione, se non esiste la crea
 def checkBackupFolder():
-    backupPath = Path(save_dir_path) / "Backup"
+    backupPath = pathlib.Path(save_dir_path) / "Backup"
     if not backupPath.exists():
         print("Creazione cartella di backup...")
         backupPath.mkdir(parents=True, exist_ok=True)
@@ -63,11 +68,10 @@ def checkBackupFolder():
     return backupPath
 
 # Esegue il backup del database MySQL in un file .sql
-
 def backupDockerMysql():
 
     backupPath = checkBackupFolder()
-    backupFile = backupPath / f"backup_{timestamp}.sql"
+    backupFile = backupPath / f"backup_{dateNow}.sql"
 
     try:
         print("Eseguendo il backup del database...")
@@ -82,11 +86,11 @@ def backupDockerMysql():
             print(f'Errore durante la fase di [BACKUP DATABASE MYSQL] {timestampLog}', file=f)
         print(f"Errore durante il backup: {e}")
         sys.exit(1)
-    
+
 # Esegue il backup del volume Docker in un file .tar.gz
 def backupDockerVolume():
     backupPath = checkBackupFolder()
-    backupFile =f"volume_{timestamp}.tar.gz"
+    backupFile =f"volume_{dateNow}.tar.gz"
     
     print(f"Nome volume: {volume_name}")
     print(f"nome container: {db_container_name}")
@@ -104,15 +108,51 @@ def backupDockerVolume():
             print(f'Errore durante la fase di [BACKUP VOLUME] {timestampLog}', file=f)
         print(f"Errore durante il backup: {e}")
         sys.exit
-        
-        
 
+#funzione per raccogliere i file di backup esistenti in un array
+def backupGroup():
+    for path in pathlib.Path(pathcompleto).glob("*.tar.gz"):
+        try:
+            gruppoBackup.append(pathcompleto + path.name)
+        except OSError as e:
+            sys.exit(1)
+        
+    for path in pathlib.Path(pathcompleto).glob("*.sql"):
+        try:
+            gruppoBackup.append(pathcompleto + path.name)
+        except OSError as e:
+            sys.exit(1)
+
+#funzione per eliminare i file di backup più vecchi di 10 giorni
+def reciclyngBackup():
+    for path in gruppoBackup:
+        file_stat = pathlib.Path(path).stat()
+        file_ctime = file_stat.st_ctime
+        if( timestamp - file_ctime > deleteOlderThan):
+            print(f"Controllo file: {path}, creato il: {(file_ctime)}")
+            with open('log.txt', 'a', opener=opener) as f:
+                print(f"Il file {path} è più vecchio di {deleteOlderThan/86000} giorni e verrà eliminato.")
+            try:
+                os.remove(path)
+            except OSError as e:
+                print(f"Errore durante l'eliminazione del file {path}: {e}")
+                sys.exit(1)
+
+def backupCompleted():
+    with open('log.txt', 'a', opener=opener) as f:
+        print(f'[BACKUP COMPLETATO] {timestampLog}', file=f)
 
 #####################################
 #            START BACKUP           #
 #####################################
+
 checkVariables(configArr)
+
 backupDockerMysql()
 backupDockerVolume()
-with open('log.txt', 'a', opener=opener) as f:
-            print(f'[BACKUP COMPLETATO] {timestampLog}', file=f)
+
+backupGroup()
+reciclyngBackup()
+
+backupCompleted()
+print("Backup completato con successo.")
