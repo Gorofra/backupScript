@@ -25,7 +25,6 @@ dateNow = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 timestampLog = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
 
 deleteOlderThan = int(config['backup.time.env']['elimination_time'])*60
-tempo = config['backup.time.env']['elimination_time']
 timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 pathcompleto = save_dir_path + f"{save_dir}\\"
 
@@ -38,6 +37,8 @@ configArr = [
     ('db_name', db_name),
     ('volume_name', volume_name),
     ('save_dir_path', save_dir_path)
+    ('save_dir', save_dir),
+    ('deleteOlderThan', deleteOlderThan),
 ]
 
 
