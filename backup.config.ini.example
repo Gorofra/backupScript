@@ -1,13 +1,17 @@
-    [windows.general.env]
-    save_dir_path =
+[windows.general.env]
+save_dir_path =
+save_dir =
+
+[mysql.docker.env]
+db_container_name =
+db_user =
+db_password =
+db_name =
 
 
-    [mysql.docker.env]
-    db_container_name =
-    db_user =
-    db_password =
-    db_name =
+[image.docker.env]
+volume_name =
 
-
-    [image.docker.env]
-    volume_name =
+[backup.time.env]
+elimination_time =
+; minuti

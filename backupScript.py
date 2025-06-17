@@ -4,7 +4,7 @@ import docker
 import subprocess
 import configparser
 import pathlib
-from datetime import datetime
+import datetime
 from dotenv import load_dotenv
 
 ##################################
@@ -21,14 +21,16 @@ volume_name = config['image.docker.env']['volume_name']
 save_dir_path = config['windows.general.env']['save_dir_path']
 save_dir = config['windows.general.env']['save_dir']
 
-dateNow = datetime.now().strftime("%Y%m%d_%H%M%S")
-timestampLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
+dateNow = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+timestampLog = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
 
-deleteOlderThan = 604800  # seconds
-timestamp = datetime.timestamp(datetime.now())
+deleteOlderThan = int(config['backup.time.env']['elimination_time'])*60
+tempo = config['backup.time.env']['elimination_time']
+timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 pathcompleto = save_dir_path + f"{save_dir}\\"
-gruppoBackup = []
 
+
+gruppoBackup = []
 configArr = [
     ('db_container_name', db_container_name),
     ('db_user', db_user),
@@ -125,28 +127,40 @@ def backupGroup():
         except OSError as e:
             sys.exit(1)
 
-#funzione per eliminare i file di backup più vecchi di 10 giorni
+#funzione per eliminare i file di backup più vecchi di deleteOlderThan
 def reciclyngBackup():
+    print("Inizio controllo file di backup...")
     for path in gruppoBackup:
         file_stat = pathlib.Path(path).stat()
         file_ctime = file_stat.st_ctime
-        print(f"Controllo file: {path}, creato il: {(file_ctime)}")
+        print(f"Controllo file: {path}, creato il: {formatDateTimestap(file_ctime)}")
         if( timestamp - file_ctime > deleteOlderThan):
-            
-            with open('log.txt', 'a', opener=opener) as f:
-                print(f"Il file {path} è più vecchio di {deleteOlderThan/86000} giorni e verrà eliminato.")
+            if(deleteOlderThan < 3600):
+                with open('log.txt', 'a', opener=opener) as f:
+                    print(f"Il file {path} è più vecchio di {deleteOlderThan/60} minuti e verrà eliminato.", file=f)
+            elif(deleteOlderThan < 86400):
+                with open('log.txt', 'a', opener=opener) as f:
+                    print(f"Il file {path} è più vecchio di {deleteOlderThan/3600} ore e verrà eliminato.", file=f)
+            else:
+                with open('log.txt', 'a', opener=opener) as f:
+                    print(f"Il file {path} è più vecchio di {deleteOlderThan/86000} giorni e verrà eliminato.", file=f)
             try:
                 os.remove(path)
             except OSError as e:
                 print(f"Errore durante l'eliminazione del file {path}: {e}")
                 sys.exit(1)
         else:
-            print(f"Il file {path} è stato creato il: {(file_ctime)} e non verrà eliminato.")
+            print(f"Il file {path} è stato creato il: {formatDateTimestap(file_ctime)} e non verrà eliminato.")
 
 
 def backupCompleted():
+    timestamp2 = datetime.datetime.timestamp(datetime.datetime.now())
     with open('log.txt', 'a', opener=opener) as f:
-        print(f'[BACKUP COMPLETATO] {timestampLog}', file=f)
+        print(f'[BACKUP COMPLETATO] {timestampLog}in {timestamp2 - timestamp} secondi', file=f)
+        
+def formatDateTimestap(timestamp):
+    time = datetime.datetime.fromtimestamp(timestamp)
+    return time.strftime("%Y-%m-%d %H:%M:%S %Z")
 
 #####################################
 #            START BACKUP           #

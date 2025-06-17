@@ -6,3 +6,29 @@ Errore durante la fase di [VARIABILE MANCANTE] 20250616_232007
 Errore durante la fase di [VARIABILE MANCANTE] db_user 20250616_232034
 Errore durante la fase di [VARIABILE MANCANTE] db_user 2025-06-16 23:21:56
 [BACKUP COMPLETATO] 2025-06-16 23:25:48
+[BACKUP COMPLETATO] 2025-06-17 15:23:58 
+[BACKUP COMPLETATO] 2025-06-17 15:25:18 
+[BACKUP COMPLETATO] 2025-06-17 15:28:00 
+[BACKUP COMPLETATO] 2025-06-17 15:41:14 
+[BACKUP COMPLETATO] 2025-06-17 15:42:21 
+[BACKUP COMPLETATO] 2025-06-17 15:47:28 
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_154728.tar.gz è più vecchio di 0.016666666666666666 ore e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_154728.sql è più vecchio di 0.016666666666666666 ore e verrà eliminato.
+[BACKUP COMPLETATO] 2025-06-17 15:50:03 
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_155003.tar.gz è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_155003.sql è più vecchio di 1.0 minuti e verrà eliminato.
+[BACKUP COMPLETATO] 2025-06-17 15:51:13 
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_155113.tar.gz è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_155113.sql è più vecchio di 1.0 minuti e verrà eliminato.
+[BACKUP COMPLETATO] 2025-06-17 15:57:13 
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_155713.tar.gz è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_155713.sql è più vecchio di 1.0 minuti e verrà eliminato.
+[BACKUP COMPLETATO] 2025-06-17 16:00:25  in 2.299934148788452 secondi
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_155958.tar.gz è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_155958.sql è più vecchio di 1.0 minuti e verrà eliminato.
+[BACKUP COMPLETATO]2025-06-17 16:01:10  in 2.3733692169189453 secondi
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_160012.tar.gz è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\volume_20250617_160025.tar.gz è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_160012.sql è più vecchio di 1.0 minuti e verrà eliminato.
+Il file C:\Users\franc\OneDrive\Documenti\Backup\Viadeifossi\backup_20250617_160025.sql è più vecchio di 1.0 minuti e verrà eliminato.
+[BACKUP COMPLETATO] 2025-06-17 16:01:37 in 2.4013848304748535 secondi
