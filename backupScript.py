@@ -28,12 +28,15 @@ save_dir = config['windows.general.env']['save_dir']
 
 dateNow = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 timestampLog = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
+
+
 try:
     elimination_time = int(config['backup.time.env']['elimination_time'])*60
 except ValueError:
     with open('log.txt', 'a', opener=opener) as f:
-                print(f'Errore durante la fase di [VARIABILE MANCANTE] Tempo eliminazione in minuti {timestampLog}', file=f)
+                print(f'Errore durante la fase di [VARIABILE MANCANTE] [Tempo eliminazione in minuti.] {timestampLog}', file=f)
     sys.exit(1)
+
 timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 pathcompleto = save_dir_path + f"{save_dir}\\"
 
@@ -45,7 +48,7 @@ configArr = [
     ('db_password', db_password),
     ('db_name', db_name),
     ('volume_name', volume_name),
-    ('save_dir_path', save_dir_path)
+    ('save_dir_path', save_dir_path),
     ('save_dir', save_dir),
     ('elimination_time', elimination_time),
 ]
@@ -136,6 +139,7 @@ def backupGroup():
             gruppoBackup.append(pathcompleto + path.name)
         except OSError as e:
             sys.exit(1)
+    print("Raccolta file di backup completata.")
 
 #funzione per eliminare i file di backup più vecchi di elimination_time
 def reciclyngBackup():
